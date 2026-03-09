@@ -11,22 +11,45 @@ const initialFormState = {
   help_text: "",
 };
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 type SubmitStatus = "idle" | "loading" | "success" | "error";
 
 export default function IntakeForm() {
   const [formData, setFormData] = useState(initialFormState);
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Partial<typeof initialFormState>>({});
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear the error for this field as the user corrects it
+    if (fieldErrors[name as keyof typeof initialFormState]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
+  }
+
+  function validate(): boolean {
+    const errors: Partial<typeof initialFormState> = {};
+    if (!formData.name.trim()) errors.name = "Name is required.";
+    if (!formData.email.trim()) {
+      errors.email = "Email is required.";
+    } else if (!EMAIL_REGEX.test(formData.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+    if (!formData.business_name.trim()) errors.business_name = "Business name is required.";
+    if (!formData.industry) errors.industry = "Please select an industry.";
+    if (!formData.help_text.trim()) errors.help_text = "Please describe what you need help with.";
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!validate()) return;
     setStatus("loading");
     setErrorMessage("");
 
@@ -84,58 +107,54 @@ export default function IntakeForm() {
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <Field label="Full name" htmlFor="name">
+        <Field label="Full name" htmlFor="name" error={fieldErrors.name}>
           <input
             id="name"
             name="name"
             type="text"
-            required
             autoComplete="name"
             value={formData.name}
             onChange={handleChange}
             placeholder="Jane Smith"
-            className={inputClass}
+            className={fieldErrors.name ? inputErrorClass : inputClass}
           />
         </Field>
 
-        <Field label="Email address" htmlFor="email">
+        <Field label="Email address" htmlFor="email" error={fieldErrors.email}>
           <input
             id="email"
             name="email"
             type="email"
-            required
             autoComplete="email"
             value={formData.email}
             onChange={handleChange}
             placeholder="jane@company.com"
-            className={inputClass}
+            className={fieldErrors.email ? inputErrorClass : inputClass}
           />
         </Field>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <Field label="Business name" htmlFor="business_name">
+        <Field label="Business name" htmlFor="business_name" error={fieldErrors.business_name}>
           <input
             id="business_name"
             name="business_name"
             type="text"
-            required
             autoComplete="organization"
             value={formData.business_name}
             onChange={handleChange}
             placeholder="Acme Corp"
-            className={inputClass}
+            className={fieldErrors.business_name ? inputErrorClass : inputClass}
           />
         </Field>
 
-        <Field label="Industry" htmlFor="industry">
+        <Field label="Industry" htmlFor="industry" error={fieldErrors.industry}>
           <select
             id="industry"
             name="industry"
-            required
             value={formData.industry}
             onChange={handleChange}
-            className={inputClass}
+            className={fieldErrors.industry ? inputErrorClass : inputClass}
           >
             <option value="" disabled>
               Select an industry
@@ -149,16 +168,15 @@ export default function IntakeForm() {
         </Field>
       </div>
 
-      <Field label="How can we help?" htmlFor="help_text">
+      <Field label="How can we help?" htmlFor="help_text" error={fieldErrors.help_text}>
         <textarea
           id="help_text"
           name="help_text"
-          required
           rows={5}
           value={formData.help_text}
           onChange={handleChange}
           placeholder="Describe your business challenge or what you're looking to build..."
-          className={`${inputClass} resize-none`}
+          className={`${fieldErrors.help_text ? inputErrorClass : inputClass} resize-none`}
         />
       </Field>
 
@@ -207,13 +225,18 @@ export default function IntakeForm() {
 const inputClass =
   "w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition";
 
+const inputErrorClass =
+  "w-full rounded-lg border border-red-400 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition";
+
 function Field({
   label,
   htmlFor,
+  error,
   children,
 }: {
   label: string;
   htmlFor: string;
+  error?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -222,6 +245,7 @@ function Field({
         {label}
       </label>
       {children}
+      {error && <p className="text-xs text-red-600 mt-0.5">{error}</p>}
     </div>
   );
 }
