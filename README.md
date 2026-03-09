@@ -30,11 +30,7 @@ A full-stack web application where potential clients submit their business needs
 npm install
 ```
 
-2. Copy the example env file and fill in your credentials:
-
-```bash
-cp .env.example .env.local
-```
+2. Create a .env file and fill in your credentials:
 
 | Variable | Where to find it |
 |----------|-----------------|
