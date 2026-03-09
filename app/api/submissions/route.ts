@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { analyzeSubmission } from "@/lib/ai";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     console.error("[POST /api/submissions] AI analysis failed:", err);
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("submissions")
     .insert({
       name: name.trim(),
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const category = req.nextUrl.searchParams.get("category");
 
-  let query = supabase
+  let query = getSupabase()
     .from("submissions")
     .select("*")
     .order("created_at", { ascending: false });

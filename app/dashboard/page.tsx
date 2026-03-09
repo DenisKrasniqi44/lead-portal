@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import SubmissionTable from "@/components/submission-table";
 import CategoryFilter from "@/components/category-filter";
 import type { Submission } from "@/lib/types";
@@ -16,7 +16,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     ? rawCategory
     : undefined;
 
-  let query = supabase
+  let query = getSupabase()
     .from("submissions")
     .select("*")
     .order("created_at", { ascending: false });
