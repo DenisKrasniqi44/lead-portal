@@ -8,6 +8,8 @@ interface DashboardPageProps {
   searchParams: Promise<{ category?: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const { category: rawCategory } = await searchParams;
 
@@ -29,7 +31,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   return (
     <main className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Submissions</h1>
           {!error && (

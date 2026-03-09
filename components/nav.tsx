@@ -29,7 +29,7 @@ export default function Nav() {
                 href={href}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-gray-100 text-gray-900"
+                    ? "bg-indigo-600 text-white"
                     : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                 }`}
               >
