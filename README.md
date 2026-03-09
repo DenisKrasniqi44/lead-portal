@@ -1,5 +1,7 @@
 # Smart Lead Intake Portal
 
+**Live app:** [https://link here.app](https://link here.app)
+
 A full-stack web application where potential clients submit their business needs through a structured intake form. Each submission is automatically summarized and categorized by an AI model, and all entries are visible in a filterable dashboard.
 
 ## Tech Stack

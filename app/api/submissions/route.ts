@@ -17,7 +17,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Please provide a valid email address." }, { status: 400 });
   }
 
-  const { summary, category } = await analyzeSubmission(help_text);
+  let summary: string | null = null;
+  let category: string | null = null;
+
+  try {
+    const result = await analyzeSubmission(help_text);
+    summary = result.summary;
+    category = result.category;
+  } catch (err) {
+    console.error("[POST /api/submissions] AI analysis failed:", err);
+  }
 
   const { data, error } = await supabase
     .from("submissions")
